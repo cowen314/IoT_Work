@@ -2,7 +2,7 @@ classdef DataExaminer
 % A class to help with data examination
 
     methods (Static)
-        function genSampleInfo(filename)
+        function Fs = sampleInfo(filename)
             dataMatrix = csvread(filename,3,0);
             sampleTimes_ms = dataMatrix(:,1);
             sampleSpacing = filter2([-1; 1],sampleTimes_ms);
@@ -10,14 +10,27 @@ classdef DataExaminer
             disp(['Standard sample time deviation (ms): ', ...
                 num2str(std(sampleSpacing))]);
             disp(['Sample period (ms): ', num2str(mean(sampleSpacing))]);
-            disp(['Sample frequency (Hz): ', ...
-                num2str(1/mean(sampleSpacing)*1000)]);
+            Fs = 1/mean(sampleSpacing)*1000;
+            disp(['Sample frequency (Hz): ', num2str(Fs)]);
         end
         
-        function powerSpectrum(filename,colNumber)
+        function pxx = powerSpectrum(filename,colNumber,windowSize)
             dataMatrix = csvread(filename,3,0);
             data = dataMatrix(:,colNumber);
-            pwelch(data);
+            windowsMatrix = frameSegment(data,windowSize);
+            pxx = pwelch(windowsMatrix);
+        end
+        
+        function [ zcr ] = zcr(filename,colNumber,windowSize)
+        %ZCR zero crossing rate
+            dataMatrix = csvread(filename,3,0);
+            data = dataMatrix(:,colNumber);
+            % below, data becomes a matrix
+            data = frameSegment(data,windowSize);
+            data_shifted = data(2:end,:);
+            data = data(1:(end-1),:);
+            zcr = sum(abs(sign(data)-sign(data_shifted))) / ...
+                (2*(size(data,1)+1));
         end
         
         function plots(filename, colNumber, window)
@@ -61,7 +74,6 @@ classdef DataExaminer
                     (1000*60),dataMatrix2(:,colNumber));
             end
             xlabel('Time (minutes)');
-            
         end
         
         function [fpeak, amplitude] = largestPeaks(filename, window)
