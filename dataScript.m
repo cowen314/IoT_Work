@@ -23,3 +23,7 @@ plot(zcr)
 title('Zero Crossing Rate')
 xlabel('Window index number')
 ylabel('ZCR')
+
+%% Spectrogram
+figure
+DataExaminer.plots('Treadmill1B_E887.csv',2,256);
