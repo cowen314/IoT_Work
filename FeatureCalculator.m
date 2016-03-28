@@ -7,15 +7,20 @@ classdef FeatureCalculator
     
     methods (Static)
         function [lag, HR] = harmonicity(audio,minlag,~)
-        %HARMONICITY Calculates lag (number of lag samples that maximize the )
+        %HARMONICITY Calculates lag and normalized harmonic ratio
             % lag - number of lag samples that maximize the autocorellation
             % HR - largest value above minlag in the normalized
             % autocorellation
+            % Stick a third argument in to plot the autocorellation
             r = xcorr(audio,'coeff');
-            r = r(floor(length(r)/2):length(r));
-            r(1:minlag) = 0;
+            r = r(floor(length(r)/2):length(r),:);
+            if(minlag > 0)
+                r(1:minlag,:) = 0;
+            end
             if(nargin==3)
+                figure
                 plot(r)
+                title('Autocorrelation')
             end
             HR = max(r);
             lag = find(r==max(r));
@@ -41,6 +46,8 @@ classdef FeatureCalculator
             flatness = geomean(spectrum)/mean(spectrum);
             
         end
+        
+        
         
     end
     
