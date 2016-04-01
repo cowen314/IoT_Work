@@ -36,15 +36,24 @@ for i = 1:length(filenames)
     Fs = DataExaminer.sampleInfo(filenames{i});
     powerSpectra = DataExaminer.powerSpectrum(filenames{i},2,...
         WINDOW_SIZE);
-    subplot(2,1,1)
+    subplot(3,1,1)
     f_axis = linspace(0,Fs/2,WINDOW_SIZE/2+1);
     plot(f_axis,10*log10(powerSpectra))
     title('Power Spectral Density')
     xlabel('Frequency (Hz)')
     ylabel('Power/Frequency (dB/(rad/sample))')
 
+    fftSignal = DataExaminer.frequencySpectrum(filenames{i},2,...
+        WINDOW_SIZE);
+    subplot(3,1,2)
+    f_axis = length(fftSignal)/2*linspace(-1,1,length(fftSignal));
+    plot(f_axis,abs(fftSignal))
+    title('Frequency Spectrum')
+    xlabel('Frequency (Hz)')
+    ylabel('Magnitude')
+    
     zcr = DataExaminer.zcr(filenames{i},2,256);
-    subplot(2,1,2)
+    subplot(3,1,3)
     plot(zcr)
     title('Zero Crossing Rate')
     xlabel('Window index number')

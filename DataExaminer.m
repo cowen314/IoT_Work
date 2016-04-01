@@ -21,6 +21,13 @@ classdef DataExaminer
             pxx = pwelch(windowsMatrix);
         end
         
+        function pxx = frequencySpectrum(filename,colNumber,windowSize)
+            dataMatrix = csvread(filename,3,0);
+            data = dataMatrix(:,colNumber);
+            windowsMatrix = frameSegment(data,windowSize);
+            pxx = fftshift(fft(windowsMatrix));
+        end
+        
         function [ zcr ] = zcr(filename,colNumber,windowSize)
         %ZCR zero crossing rate
             dataMatrix = csvread(filename,3,0);
