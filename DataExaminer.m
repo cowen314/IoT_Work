@@ -35,12 +35,17 @@ classdef DataExaminer
         
         function features = plots(filename, colNumber, window, sInd, eInd, eventInd)
             % data extraction
-            dataMatrix = csvread(filename,3,0);
-            time = dataMatrix(sInd:eInd,1)/(1000);
+            % dataMatrix = csvread(filename,3,0);
+            % time = dataMatrix(sInd:eInd,1)/(1000);
+            
+            time = csvread(filename,sInd,0,[sInd 0 eInd 0])/(1000);
+            
             time = time-time(1);
             Fs = 1/((time(2)-time(1)));
-            data = dataMatrix(sInd:eInd,colNumber);
+            % data = dataMatrix(sInd:eInd,colNumber);
+            data = csvread(filename,sInd,colNumber-1,[sInd colNumber-1 eInd colNumber-1]);
             data = data - mean(data);
+            disp('mean subtracted out of data')
             
             % spectrogram
             subplot(3,2,1)
@@ -76,35 +81,40 @@ classdef DataExaminer
             plot(zcr)
             title('ZCR')
             
-            % energy
+            % power
             subplot(3,2,4)
-            energy = sum(dataMatrix.^2);
-            plot(energy)
-            title('Signal energy')
+            power = sum(dataMatrix.^2)/window;
+            plot(power)
+            title('Signal power')
             
             % harmonic ratio
             % FeatureCalculator(dataMatrix,10,)
             
             % feature space plot
             subplot(3,2,5)
-            eventInd_window = floor((eventInd-sInd)/window);
-            zcr_pre = zcr(1:eventInd_window);
-            zcr_post = zcr(eventInd_window+1:end);
-            energy_pre = energy(1:eventInd_window);
-            energy_post = energy(eventInd_window+1:end);
-            plot(zcr_pre,energy_pre,'o',zcr_post,energy_post,'x');
-            xlabel('zcr')
-            ylabel('energy')
+            % Note: the below code is for examining before and after a
+            % particular incident
             
-            % features = [zcr, energy];
+            % eventInd_window = floor((eventInd-sInd)/window);
+            % zcr_pre = zcr(1:eventInd_window);
+            % zcr_post = zcr(eventInd_window+1:end);
+            % power_pre = power(1:eventInd_window);
+            % power_post = power(eventInd_window+1:end);
+            % plot(zcr_pre,power_pre,'o',zcr_post,power_post,'x');
+            
+            plot(zcr,power,'o');
+            xlabel('zcr')
+            ylabel('power')
+            
+            % features = [zcr, power];
             
             % power plot (of post section)
             subplot(3,2,6)
-            pwelch(data((eventInd-sInd):end));
+            pwelch(data);
             
         end
         
-        function plotTime(filename, colNumber)
+        function plotTime(filename, colNumber, ~)
             colOffset = colNumber-1;
             N = countLines(filename);
             time = csvread(filename,3,0,[3 0 N-2 0]);
@@ -112,8 +122,13 @@ classdef DataExaminer
             time = time/(1000*60);
             time = time-time(1);
             data = csvread(filename,3,colOffset,[3 colOffset N-2 colOffset]);
-            plot(time,data);
-            xlabel('Time stamps (min)')
+            if(nargin > 2)
+                plot(data)
+                xlabel('Raw indicies')
+            else
+                plot(time,data);
+                xlabel('Time stamps (min)')
+            end
             % plot(data)
         end
             
@@ -178,6 +193,11 @@ classdef DataExaminer
             data = csvread(filename,2+startI,colNumber,[2+startI ...
                 colNumber endI-2 colNumber]);
             
+        end
+        
+        function data = getRange(filename,column,sRow,eRow)
+            data = csvread(filename,sRow,column-1,[sRow column-1 ...
+                eRow column-1]);
         end
         
     end
