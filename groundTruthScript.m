@@ -33,8 +33,25 @@ DataExaminer.plots(names{3},4,8,CO_T3StartAndEnd(2).DataIndex,...
     CO_T3StartAndEnd(1).DataIndex,2)
 
 %% Step counting
+
+% 7 mph works well (63 counted, 63 actual)
+sRow = 217042;
+eRow = 222294;
+
+% 1 mph (23 counted, 22 actual)
+sRow = 1.825e05;
+eRow = 1.825e05+4040;
+
+% 3 mph, doesnt work so well (40 counted, 40 actual)
+sRow = 193812;
+eRow = 198458;
+
+% 5 mph (60 counted, 62 actual)
+sRow = 1.825e05+23028;
+eRow = 1.825e05+28280;
+
 data = DataExaminer.getRange(names{2},4,sRow,eRow);
-steps = stepCounter(data);
+steps = countSteps(data);
 
 %% magnetometer(s)
 
