@@ -42,7 +42,7 @@ eRow = 222294;
 sRow = 1.825e05;
 eRow = 1.825e05+4040;
 
-% 3 mph, doesnt work so well (40 counted, 40 actual)
+% 3 mph, works well (40 counted, 40 actual)
 sRow = 193812;
 eRow = 198458;
 

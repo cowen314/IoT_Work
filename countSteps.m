@@ -9,17 +9,16 @@ function stepCount = countSteps(data)
     data = data-mean(data);
     
     dataMatrix = frameSegment(data,8);
-    % power = sum(dataMatrix.^2)./size(dataMatrix,2);
-    power = sum(dataMatrix.^2);
+    % energy = sum(dataMatrix.^2)./size(dataMatrix,2);
+    energy = sum(dataMatrix.^2);
     
-    % diregard anything under 10% of the max peak
-    power_filt = power; power_filt(power_filt<1.5*mean(power)) = 0;
-    % instead of defining the threshold as a function of the maximum, do it
-    % as a function of the averge power over time
+    % diregard anything under 1.5 times the mean energy in the data
+    energy_filt = energy;
+    energy_filt(energy_filt<1.5*mean(energy)) = 0;
     
-    pks = findpeaks(power_filt,'MinPeakDistance',6,'MinPeakProminence',...
+    pks = findpeaks(energy_filt,'MinPeakDistance',6,'MinPeakProminence',...
         0.03); % 0.03 worked pretty well for running
-    % the peak prominence should be a function of ambient power
-    plot(power_filt);
+    % the peak prominence should be a function of ambient energy
+    plot(energy_filt);
     stepCount = length(pks);
 end
